@@ -57,14 +57,6 @@ describe('chatterbox', function() {
         expect(app.fetch).to.be.ok;
       });
 
-      it('should submit a GET request via $.ajax', function(done){
-        app.fetch();
-        expect($.ajax.calledOnce).to.be.true;
-        ajaxUrl = typeof $.ajax.args[0][0] === 'string' ? $.ajax.args[0][0] : $.ajax.args[0][0].url;
-        expect(ajaxUrl).to.equal(app.server);
-        done();
-      });
-
     });
 
     describe('chatroom behavior', function() {
@@ -89,7 +81,7 @@ describe('chatterbox', function() {
       it('should be able to add rooms to the DOM', function(){
         app.addRoom('superLobby');
 
-        expect($('#roomSelect').children().length).to.equal(1);
+        expect($('#room-menu').children().length).to.equal(1);
       });
 
     });
