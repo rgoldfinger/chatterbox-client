@@ -18,6 +18,7 @@ var app = {
   chatData: {},
   roomsList: {},
   newRoomsList: {},
+  friends: {},
   currentRoom: null,
   userName: null,
 
@@ -27,8 +28,8 @@ var app = {
     var $textbox = $('<input type="text" placeholder="Enter your username to chat..." id="username-input"></input>');
     var $submitButton = $('<button id="username-submit">Submit</button>');
     $('#input').append([$textbox, $submitButton]);
-    $('#username-submit').on('click', function(event){
-        event.preventDefault();
+    $('#username-submit').on('click', function(e){
+        e.preventDefault();
         var username = $('#username-input').val();
         app.userName = username;
         $('#input').children().remove();
@@ -43,8 +44,8 @@ var app = {
     var $textbox = $('<input type="text" placeholder="Enter your message..." id="message-input"></input>');
     var $sendButton = $('<button id="message-send">Send!</button>');
     $('#input').append([$textbox, $sendButton]);
-    $('#message-send').on('click', function(event) {
-      event.preventDefault();
+    $('#message-send').on('click', function(e) {
+      e.preventDefault();
       var message = {
         text: $('#message-input').val(),
         username: app.userName,
@@ -59,8 +60,8 @@ var app = {
     var $roomInput = $('<input id="create-chatroom" placeholder="Create a NEW chatroom!"></input>');
     var $roomSubmit = $('<button id="room-submit">CREATE!</button>');
     $('#room-select').append([$roomInput, $roomSubmit]);
-    $('#room-submit').on('click', function(event){
-      event.preventDefault();
+    $('#room-submit').on('click', function(e){
+      e.preventDefault();
       app.currentRoom = $('#create-chatroom').val();
       $('#create-chatroom').val('');
       app.addRoom(app.currentRoom);
@@ -112,7 +113,17 @@ var app = {
   },
 
   addMessage: function(item) {
-    var $messageHTML = $('<p class="chat"><span class="username">' + _.escape(item.username) + ': </span>' + _.escape(item.text) + '</p>');
+    var $messageHTML = $('<p class="chat"><a href="#" class="username">' + _.escape(item.username) + '</a>: ' + _.escape(item.text) + '</p>');
+    if (app.friends.hasOwnProperty(_.escape(item.username))) {
+      $messageHTML.find('a').addClass('friend');
+    }
+
+    $messageHTML.find('a').on('click', function(e){
+      console.log('YOU GOT A NEW FRIEND! YAY!!!!!!!!!!1111');
+      e.preventDefault();
+      app.friends[$(this).text().trim()] = true;
+      console.dir(app.friends);
+    });
     $('#chats').append($messageHTML);
   },
 
@@ -146,7 +157,7 @@ var app = {
 
 $(document).ready(function() {
   app.init();
-  $('#room-menu').change(function(event) {
+  $('#room-menu').change(function(e) {
     var val = $('#room-menu option:selected').text();
     app.currentRoom = val;
     app.render();
