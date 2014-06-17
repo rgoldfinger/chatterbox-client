@@ -23,9 +23,23 @@ var Chatter = Backbone.Model.extend({
   },
 
   processFetchedData: function(data) {
-    this.chatData = data.results;
+    this.chats = data.results;
 
 
-  },
+  }
 
 });
+
+var ChatterView = Backbone.View.extend({
+  initialize: function() {
+
+  },
+  generateMessageHTML: function() {
+
+  },
+  render: function() {
+    _.map()
+
+  }
+});
+
