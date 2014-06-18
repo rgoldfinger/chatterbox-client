@@ -38,6 +38,9 @@ var Messages = Backbone.Collection.extend({
     setInterval(function(){
       this.getMessagesFromServer();
     }.bind(this), 1000);
+    // this.on('add', function(msg){
+    //   console.log(msg);
+    // });
   },
 
   getMessagesFromServer: function(){
@@ -59,14 +62,15 @@ var Messages = Backbone.Collection.extend({
     var messages = _.map(data, function(msg){
       return new Message(msg);
     });
-    this.set(messages);
-    show();
+
+    this.reset(messages);
+    // show();
   }
 });
 
 var MessagesView = Backbone.View.extend({
   initialize: function() {
-
+    this.listenTo(this.collection, 'reset', this.render);
   },
 
   render: function() {
@@ -74,24 +78,30 @@ var MessagesView = Backbone.View.extend({
       var messageView = new MessageView({model: msg});
       return messageView.render();
     }.bind(this));
+    $('chats').children().remove();
+    this.$el.children().remove();
     return this.$el.append(messageNodes);
-  }
+  },
+
+  addOne: function(msg){
+    debugger;
+    var messageView = new MessageView({model: msg});
+    $('#chats').prepend(messageView.render());
+  },
 
 });
 
 
-var show;
+// var show;
 
 $(function(){
   var messages = new Messages();
 
   var messagesView = new MessagesView({collection: messages});
 
-  show = function () {
-
-
-    $('#chats').append(messagesView.render());
-  };
+  // show = function () {
+  $('#chats').append(messagesView.render());
+  // };
 });
 
 
