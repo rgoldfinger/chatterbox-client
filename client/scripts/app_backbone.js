@@ -1,50 +1,6 @@
-// var Chatter = Backbone.Model.extend({
-
-//   initialize: function(){
-//     this.chats = {};
-//     this.server =  'https://api.parse.com/1/classes/chatterbox';
-//   },
-
-//   getAllMessages: function() {
-//     var urlOptions = '?order=-createdAt';
-//     var _this = this;
-
-//     $.ajax({
-//       url: _this.server + urlOptions,
-//       type: 'GET',
-//       success: function(data){
-//         _this.processFetchedData(data);
-
-//       },
-//       error: function(data){
-//         console.error("looks like we're all alone in the universe...");
-//       }
-//     });
-//   },
-
-//   processFetchedData: function(data) {
-//     this.chats = data.results;
-
-
-//   }
-
-// });
-
-// var ChatterView = Backbone.View.extend({
-//   initialize: function() {
-
-//   },
-//   generateMessageHTML: function() {
-
-//   },
-//   render: function() {
-//     _.map()
-
-//   }
-// });
 
 var Message = Backbone.Model.extend({
-  
+
   initialize: function(message){
     this.text = message.text;
     this.username = message.username;
@@ -73,18 +29,69 @@ var MessageView = Backbone.View.extend({
   }
 });
 
-var msg = {
-  text: "hellow",
-  username: "whatever",
-  roomname: "havefun"
-};
+var Messages = Backbone.Collection.extend({
 
-$('document').ready(function(){
-  var message = new Message(msg);
+  model: Message,
 
-  var messageView = new MessageView({model: message});
+  initialize: function(){
+    this.server = 'https://api.parse.com/1/classes/chatterbox';
+    setInterval(function(){
+      this.getMessagesFromServer();
+    }.bind(this), 1000);
+  },
 
-  $('#chats').append(messageView.render());
+  getMessagesFromServer: function(){
+    var _this = this;
+    var urlOptions = '?order=-createdAt';
+    $.ajax({
+      url: _this.server + urlOptions,
+      type: 'GET',
+      success: function(data){
+        _this.processMessageData(data.results);
+      },
+      error: function(data){
+        console.error(":'{");
+      }
+    });
+  },
+
+  processMessageData: function(data){
+    var messages = _.map(data, function(msg){
+      return new Message(msg);
+    });
+    this.set(messages);
+    show();
+  }
+});
+
+var MessagesView = Backbone.View.extend({
+  initialize: function() {
+
+  },
+
+  render: function() {
+    var messageNodes = this.collection.map(function(msg) {
+      var messageView = new MessageView({model: msg});
+      return messageView.render();
+    }.bind(this));
+    return this.$el.append(messageNodes);
+  }
+
+});
+
+
+var show;
+
+$(function(){
+  var messages = new Messages();
+
+  var messagesView = new MessagesView({collection: messages});
+
+  show = function () {
+
+
+    $('#chats').append(messagesView.render());
+  };
 });
 
 
